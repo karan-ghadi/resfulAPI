@@ -5,11 +5,6 @@ const morgan = require('morgan');
 const userRoute = require('./routes/users');
 const app = express();
 
-// mongoose
-// mongoose.connect('localhost:27017/restapi', {
-// 	useNewUrlParser: true
-// });
-
 mongoose.connect('mongodb://localhost:27017/restapi', {
 	useNewUrlParser: true
 });
@@ -30,12 +25,18 @@ app.use((req, res, next) => {
 	if (req.method === 'OPTIONS') {
 		res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
 		return res.status(200).json({});
-		next();
 	}
+	next();
 })
 
 // api calls
 app.use('/api/v1/users', userRoute);
+
+
+app.use('*', (req, res, next) => {
+	console.log('get user work')
+})
+
 
 app.use((req, res, next) => {
 	const error = new Error('Not Found');
