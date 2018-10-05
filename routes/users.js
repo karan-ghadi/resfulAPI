@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const User = require('../models/user');
 const router = express.Router();
 
+//Get user
 router.get('/', (req, res, next) => {
 	User.find()
 		.exec()
@@ -11,7 +12,7 @@ router.get('/', (req, res, next) => {
 				users: d
 			});
 		})
-		.catch(e => {
+		.catch(err => {
 			res.status(404).json({
 				message: 'no records available'
 			});
@@ -35,16 +36,17 @@ router.get('/:userId', (req, res, next) => {
 				});
 			}
 		})
-		.catch(e => {
+		.catch(err => {
 			res.status(404).json({
 				message: 'something went wrong'
 			});
 		});
 });
 
+// Add user
 router.post('/', (req, res, next) => {
-	var data = req.body;
-	var user = new User({
+	const data = req.body;
+	const user = new User({
 		_id: new mongoose.Types.ObjectId(),
 		firstName: data.firstName,
 		lastName: data.lastName,
@@ -68,11 +70,6 @@ router.post('/', (req, res, next) => {
 							user: user
 						});
 					})
-					.catch(err => {
-						res.status(404).json({
-							message: err
-						});
-					});
 			}
 		})
 		.catch(e => {
@@ -82,12 +79,13 @@ router.post('/', (req, res, next) => {
 		})
 });
 
+// Delete user
 router.delete('/:userId', (req, res, next) => {
 	const id = req.params.userId;
 	User.findById(id)
 		.exec()
-		.then(result => {
-			if (result === null) {
+		.then(d => {
+			if (d === null) {
 				res.status(404).json({
 					message: 'User not Found'
 				});
@@ -96,8 +94,7 @@ router.delete('/:userId', (req, res, next) => {
 						_id: id
 					})
 					.exec()
-					.then(result => {
-						console.log(result);
+					.then(d => {
 						res.status(200).json({
 							message: 'user deleted with id ' + id
 						});
@@ -117,4 +114,29 @@ router.delete('/:userId', (req, res, next) => {
 		});
 });
 
+// update user
+router.patch('/:username', (req, res, next) => {
+	const username = req.params.username;
+	console.log(username);
+	User.findOne({
+			userName: username.toLowerCase()
+		})
+		.exec()
+		.then(d => {
+			if (d) {
+				res.status(404).json({
+					message: 'username already used'
+				});
+			} else {
+				res.status(404).json({
+					message: 'username not found'
+				});
+			}
+		})
+		.catch(err => {
+			res.status(404).json({
+				message: err
+			});
+		})
+})
 module.exports = router;
